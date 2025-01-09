@@ -31,7 +31,6 @@ public class UrlService {
         Url url = new Url();
         url.setOriginalUrl(originalUrl);
         url.setShortKey(shortKey);
-        url.setCreatedAt(new Date());
         url.setExpirationTime(new Date(System.currentTimeMillis() + expirationTimeMs));
 
         urlRepository.save(url);
@@ -50,19 +49,14 @@ public class UrlService {
     public String getOriginalUrl(String shortKey) {
         Url url = urlRepository.findByShortKey(shortKey);
         if (url == null) {
-            throw new RuntimeException("URL not found!");
-        }
-        if (url.getExpirationTime().getTime() < System.currentTimeMillis()) {
-            urlRepository.delete(url);
-            throw new RuntimeException("URL has expired and was deleted!");
+            throw new RuntimeException("URL not found or expired!");
         }
         return url.getOriginalUrl();
     }
 
     @Scheduled(fixedRate = 60000)
     public void deleteExpiredUrls() {
-        long currentTime = System.currentTimeMillis();
-        urlRepository.deleteAllByExpirationTimeBefore(new Date(currentTime));
+        urlRepository.deleteExpiredUrls();
         System.out.println("Expired URLs deleted at: " + new Date());
     }
 }
