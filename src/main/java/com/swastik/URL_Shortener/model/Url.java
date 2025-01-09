@@ -1,11 +1,9 @@
 package com.swastik.URL_Shortener.model;
 
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.index.Indexed;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Date;
 
@@ -13,17 +11,18 @@ import java.util.Date;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "urls")
+@Entity
+@Table(name = "urls")
 public class Url {
+
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
     private String shortKey;
 
     private String originalUrl;
 
-    private Date createdAt;
-
-    @Indexed(name = "expirationTime")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date expirationTime;
 }

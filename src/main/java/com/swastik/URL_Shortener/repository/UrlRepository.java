@@ -1,15 +1,21 @@
 package com.swastik.URL_Shortener.repository;
 
 import com.swastik.URL_Shortener.model.Url;
-import org.springframework.data.mongodb.repository.MongoRepository;
+import jakarta.transaction.Transactional;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 
 @Repository
-public interface UrlRepository extends MongoRepository<Url, String> {
+public interface UrlRepository extends JpaRepository<Url, String> {
 
     Url findByShortKey(String shortKey);
 
-    void deleteAllByExpirationTimeBefore(Date date);
+    @Transactional
+    @Modifying
+    @Query("DELETE FROM Url u WHERE u.expirationTime < CURRENT_TIMESTAMP")
+    void deleteExpiredUrls();
 }
